@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>TR | Meme 😁</title>
+  </head>
+  <body>
+    <div id="app">
+      <div id="preview"></div>
+
+      <div>
+        <canvas id="canvas"></canvas>
+
+        <h1>Hello</h1>
+        <div class="card">
+          <button id="camera" type="button">Preview Your Photo</button>
+          <button id="take-photo" type="button" style="display: none">
+            Take photo
+          </button>
+          <input
+            type="text"
+            name=""
+            id="meme-text-top"
+            placeholder="Enter your top meme"
+          />
+          <input
+            type="text"
+            name=""
+            id="meme-text-bottom"
+            placeholder="Enter your bottom meme"
+          />
+        </div>
+      </div>
+
+      <div>
+        <canvas id="meme-canvas"></canvas>
+      </div>
+    </div>
+
+    <script type="module" src="./camera.js"></script>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
