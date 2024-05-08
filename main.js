@@ -7,7 +7,9 @@ import "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
 
 import * as faceDetection from "@tensorflow-models/face-detection";
+import * as toxicity from "@tensorflow-models/toxicity";
 
+//
 camera.addEventListener(
   "click",
 
@@ -61,21 +63,45 @@ camera.addEventListener(
 //   camera.style.display = "none";
 // });
 
-let model, detector;
+let model;
+let detector;
+
+// let handPosModel;
 
 takePhoto.addEventListener("click", async () => {
   const canvas = document.getElementById("canvas");
   const meme = document.getElementById("meme-canvas");
   const inputTop = document.getElementById("meme-text-top");
   const inputBottom = document.getElementById("meme-text-bottom");
+
   meme.width = canvas.width;
   meme.height = canvas.height;
   const context = meme.getContext("2d");
   context.drawImage(canvas, 0, 0, meme.width, meme.height);
   context.font = "bold 48px serif";
   context.fillStyle = "#fff";
+
+  const threshold = 0.9;
+  const toxicityModel = await toxicity.load(threshold);
+  const predictions = await toxicityModel.classify([
+    inputTop.value,
+    inputBottom.value,
+  ]);
+  console.log(predictions);
+
+  predictions.forEach((prediction) => {
+    const { label, results } = prediction;
+    results.forEach((result) => {
+      if (result.match) {
+        context.fillText("⚠️ " + label, 10, 80);
+        context.fillText("⚠️ " + label, 10, canvas.height - 80);
+      }
+    });
+  });
+
   context.fillText(inputTop.value, 10, 80); // Top
   context.fillText(inputBottom.value, 10, canvas.height - 80);
+
   inputTop.value = "";
   inputBottom.value = "";
 
@@ -101,6 +127,22 @@ takePhoto.addEventListener("click", async () => {
       context.fill();
     });
   });
+
+  // handPosModel = await handposeDetection.SupportedModels.MediaPipeHands;
+  // const handDetector = await handposeDetection.createDetector(handPosModel, {
+  //   runtime: "tfjs",
+  // });
+  // const predictions = await handDetector.estimateHands(meme);
+  // console.log(predictions);
+
+  // predictions.forEach((prediction) => {
+  //   prediction.keypoints.forEach((keypoint) => {
+  //     context.beginPath();
+  //     context.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
+
+  //     context.fill();
+  //   });
+  // });
 
   camera.style.display = "none";
 });
