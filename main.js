@@ -89,22 +89,36 @@ takePhoto.addEventListener("click", async () => {
   ]);
   console.log(predictions);
 
+  // Flag to keep track if toxicity was detected
+  let toxicityDetected = false;
+
   predictions.forEach((prediction) => {
     const { label, results } = prediction;
     results.forEach((result) => {
       if (result.match) {
+        toxicityDetected = true; // Set the flag to true if toxicity detected
         context.fillText("⚠️ " + label, 10, 80);
         context.fillText("⚠️ " + label, 10, canvas.height - 80);
       }
     });
   });
 
-  context.fillText(inputTop.value, 10, 80); // Top
-  context.fillText(inputBottom.value, 10, canvas.height - 80);
+  // Draw text only if no toxicity detected
+  if (!toxicityDetected) {
+    context.fillText(inputTop.value, 10, 80); // Top
+    context.fillText(inputBottom.value, 10, canvas.height - 80);
+  }
 
   inputTop.value = "";
   inputBottom.value = "";
 
+  // Perform face detection
+  await faceDetectionFn(context, meme);
+
+  camera.style.display = "none";
+});
+
+async function faceDetectionFn(context, meme) {
   model = await faceDetection.SupportedModels.MediaPipeFaceDetector;
   detector = await faceDetection.createDetector(model, { runtime: "tfjs" });
   const pr = await detector.estimateFaces(meme);
@@ -127,22 +141,4 @@ takePhoto.addEventListener("click", async () => {
       context.fill();
     });
   });
-
-  // handPosModel = await handposeDetection.SupportedModels.MediaPipeHands;
-  // const handDetector = await handposeDetection.createDetector(handPosModel, {
-  //   runtime: "tfjs",
-  // });
-  // const predictions = await handDetector.estimateHands(meme);
-  // console.log(predictions);
-
-  // predictions.forEach((prediction) => {
-  //   prediction.keypoints.forEach((keypoint) => {
-  //     context.beginPath();
-  //     context.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
-
-  //     context.fill();
-  //   });
-  // });
-
-  camera.style.display = "none";
-});
+}
